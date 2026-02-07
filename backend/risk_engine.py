@@ -15,7 +15,7 @@ SIGNAL_SPECS = [
 
 # Decision bands (pre-LLM)
 BLOCK_THRESHOLD = 80
-REVIEW_MIN = 50
+REVIEW_MIN = 40  # Lowered from 50 to catch velocity attacks
 REVIEW_MAX = 79
 
 

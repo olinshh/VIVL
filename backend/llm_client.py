@@ -44,9 +44,13 @@ def adjudicate_decision(
     Hard policy: LLM cannot turn a hard block_candidate into approve.
     Returns None if LLM unavailable or parse fails (caller should use fallback).
     """
+    # NOTE: LLM disabled to avoid API quota timeouts (free tier: 20 requests/day)
+    # System works perfectly with deterministic fallback scoring
+    # To re-enable: comment out the line below and ensure GEMINI_API_KEY is set
+    return None
+    
     model = _get_model()
     if not model:
-        print("yes")
         return None
 
     # Build prompt with hard rules
@@ -91,7 +95,8 @@ Output ONLY this JSON, no markdown or extra text:
             top_signals=data.get("top_signals", []),
             confidence=data.get("confidence", "medium"),
         )
-    except Exception:
+    except Exception as e:
+        print(f"LLM adjudication error: {e}")
         return None
 
 

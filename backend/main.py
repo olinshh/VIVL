@@ -99,15 +99,24 @@ def post_ingest(transaction: TransactionCreate):
 # --- Next (simulation: pop from queue, new id) ---
 @app.get("/transactions/next")
 def get_next_transaction():
-    """Return next transaction for simulation (new id). Call ingest with result to process."""
-    _refill_simulation_queue()
-    if not _simulation_queue:
-        return None
-    # Pop one and assign new id so ingest can store as new event
-    tx = _simulation_queue.pop(0)
-    tx = dict(tx)
-    tx["id"] = str(uuid.uuid4())
-    return tx
+    """Return next unscored transaction in chronological order for fraud detection."""
+    with get_cursor() as cur:
+        # Get oldest unscored transaction
+        cur.execute(
+            """
+            SELECT t.id, t.timestamp, t.type, t.amount, t.currency, t.user_id, t.account_age_days,
+                   t.country, t.ip_hash, t.device_id, t.psp, t.status
+            FROM transactions t
+            LEFT JOIN risk_decisions r ON t.id = r.transaction_id
+            WHERE r.id IS NULL
+            ORDER BY t.timestamp ASC
+            LIMIT 1
+            """
+        )
+        row = cur.fetchone()
+        if not row:
+            return None
+        return dict(row)
 
 
 # --- Recent transactions + decision ---

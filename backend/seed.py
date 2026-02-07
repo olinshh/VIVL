@@ -1,249 +1,219 @@
-"""Seed the database with sample data aligned to case_service.py."""
-from datetime import datetime, timedelta
+"""Synthetic transaction data: 50% normal + 50% fraudulent."""
+import json
+import random
 import uuid
+from datetime import datetime, timedelta, timezone
 
-from db import init_db, get_cursor
+from db import get_cursor, init_db
+
+CURRENCIES = ["USD", "EUR", "GBP"]
+COUNTRIES = ["US", "GB", "DE", "FR", "NL", "ES", "IT", "PL", "BR", "IN", "NG"]
+PSPS = ["stripe", "adyen", "braintree", "checkout", "worldpay", "square"]
 
 
-def seed_database():
-    """Create tables and insert sample data."""
-    print("Initializing database...")
-    init_db()
+def _ts(dt: datetime) -> str:
+    return dt.isoformat()
 
-    print("Inserting sample data...")
 
-    with get_cursor() as cursor:
-        # Sample transactions (schema aligned with db.py + case_service.py)
-        transactions = [
-            {
-                "id": str(uuid.uuid4()),
-                "timestamp": (datetime.now() - timedelta(hours=2)).isoformat(),
-                "type": "deposit",
-                "amount": 1500.00,
-                "currency": "USD",
-                "user_id": "user_123",
-                "account_age_days": 240,
-                "country": "US",
-                "ip_hash": "ip_abc123",
-                "device_id": "device_abc123",
-                "psp": "stripe",
+def _rand_id() -> str:
+    return str(uuid.uuid4())
+
+
+def seed_normal_users(cursor, start_dt: datetime) -> list[dict]:
+    """25 normal users with 2-3 transactions each = ~65 transactions."""
+    txs = []
+    for u in range(25):
+        user_id = f"user_norm_{u:03d}"
+        country = random.choice(COUNTRIES[:5])  # Stick to US, GB, DE, FR, NL
+        device_id = f"dev_{user_id}"
+        ip_hash = f"ip_{user_id}"
+        psp = random.choice(PSPS[:3])  # stripe, adyen, braintree
+        account_age = random.randint(60, 500)
+        # 2-3 transactions per user
+        n_txs = random.randint(2, 3)
+        base_amt = random.uniform(100, 400)
+        for i in range(n_txs):
+            dt = start_dt - timedelta(hours=random.uniform(1, 72))
+            t_type = random.choices(["deposit", "withdrawal"], weights=[6, 4])[0]
+            amount = max(10, random.gauss(base_amt, base_amt * 0.3))
+            txs.append({
+                "id": _rand_id(),
+                "timestamp": _ts(dt),
+                "type": t_type,
+                "amount": round(amount, 2),
+                "currency": random.choice(CURRENCIES),
+                "user_id": user_id,
+                "account_age_days": account_age,
+                "country": country,
+                "ip_hash": ip_hash,
+                "device_id": device_id,
+                "psp": psp,
                 "status": "pending",
-            },
-            {
-                "id": str(uuid.uuid4()),
-                "timestamp": (datetime.now() - timedelta(hours=1)).isoformat(),
-                "type": "withdrawal",
-                "amount": 5000.00,
-                "currency": "EUR",
-                "user_id": "user_456",
-                "account_age_days": 30,
-                "country": "UK",
-                "ip_hash": "ip_xyz789",
-                "device_id": "device_xyz789",
-                "psp": "adyen",
-                "status": "pending",
-            },
-            {
-                "id": str(uuid.uuid4()),
-                "timestamp": (datetime.now() - timedelta(minutes=30)).isoformat(),
-                "type": "transfer",
-                "amount": 250.50,
-                "currency": "USD",
-                "user_id": "user_789",
-                "account_age_days": 5,
-                "country": "US",
-                "ip_hash": "ip_def456",
-                "device_id": "device_def456",
-                "psp": "paypal",
-                "status": "pending",
-            },
-        ]
-
-        for txn in transactions:
-            cursor.execute(
-                """
-                INSERT INTO transactions
-                (id, timestamp, type, amount, currency, user_id, account_age_days,
-                 country, ip_hash, device_id, psp, status)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                """,
-                (
-                    txn["id"],
-                    txn["timestamp"],
-                    txn["type"],
-                    txn["amount"],
-                    txn["currency"],
-                    txn["user_id"],
-                    txn["account_age_days"],
-                    txn["country"],
-                    txn["ip_hash"],
-                    txn["device_id"],
-                    txn["psp"],
-                    txn["status"],
-                ),
-            )
-
-        # Sample risk decisions
-        created_at = datetime.now().isoformat()
-        risk_decisions = [
-            {
-                "id": str(uuid.uuid4()),
-                "transaction_id": transactions[0]["id"],
-                "risk_score": 15,
-                "decision": "approve",
-                "signals_json": '{"velocity": "normal", "location_match": true}',
-                "llm_rationale": "Transaction amount and pattern consistent with user history",
-                "created_at": created_at,
-            },
-            {
-                "id": str(uuid.uuid4()),
-                "transaction_id": transactions[1]["id"],
-                "risk_score": 75,
-                "decision": "review",
-                "signals_json": '{"velocity": "high", "location_match": false, "amount_anomaly": true}',
-                "llm_rationale": "Large transaction from new location requires manual review",
-                "created_at": created_at,
-            },
-            {
-                "id": str(uuid.uuid4()),
-                "transaction_id": transactions[2]["id"],
-                "risk_score": 93,
-                "decision": "block",
-                "signals_json": '{"velocity": "very_high", "device_mismatch": true, "vpn_detected": true}',
-                "llm_rationale": "Device fingerprint mismatch and VPN usage from high-risk location",
-                "created_at": created_at,
-            },
-        ]
-
-        for risk in risk_decisions:
-            cursor.execute(
-                """
-                INSERT INTO risk_decisions
-                (id, transaction_id, risk_score, decision, signals_json, llm_rationale, created_at)
-                VALUES (?, ?, ?, ?, ?, ?, ?)
-                """,
-                (
-                    risk["id"],
-                    risk["transaction_id"],
-                    risk["risk_score"],
-                    risk["decision"],
-                    risk["signals_json"],
-                    risk["llm_rationale"],
-                    risk["created_at"],
-                ),
-            )
-
-        # Sample cases
-        cases = []
-        for i in range(6):
-            cases.append(
-                {
-                    "case_id": f"CASE-2026-00{i + 1}",
-                    "primary_transaction_id": transactions[i % len(transactions)]["id"],
-                    "status": "open",
-                    "confidence": "medium" if i % 2 == 0 else "high",
-                    "hypothesis_json": '[{"title": "Potential fraud pattern", "why": "Unusual behavior detected"}]',
-                    "evidence_json": '[{"item": "Signal anomalies", "transaction_ids": []}]',
-                    "timeline_json": '[{"timestamp": "2026-02-07T10:00:00", "event": "Flagged activity"}]',
-                    "recommendations_json": '[{"action": "Manual review", "reason": "Validate identity and intent"}]',
-                    "investigation_suggestions_json": '["Check linked accounts", "Review IP/device history"]',
-                    "created_at": datetime.now().isoformat(),
-                }
-            )
-
-        for case in cases:
-            cursor.execute(
-                """
-                INSERT INTO cases
-                (case_id, primary_transaction_id, status, confidence, hypothesis_json,
-                 evidence_json, timeline_json, recommendations_json, investigation_suggestions_json, created_at)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                """,
-                (
-                    case["case_id"],
-                    case["primary_transaction_id"],
-                    case["status"],
-                    case["confidence"],
-                    case["hypothesis_json"],
-                    case["evidence_json"],
-                    case["timeline_json"],
-                    case["recommendations_json"],
-                    case["investigation_suggestions_json"],
-                    case["created_at"],
-                ),
-            )
-
-        # Sample audit log
-        audit_logs = [
-            {
-                "event_id": "EVT-001",
-                "event_type": "TRANSACTION_CREATED",
-                "actor": "system",
-                "payload_json": '{"amount": 1500.00, "currency": "USD"}',
-                "created_at": datetime.now().isoformat(),
-            },
-            {
-                "event_id": "EVT-002",
-                "event_type": "RISK_ASSESSMENT",
-                "actor": "fraud_engine",
-                "payload_json": '{"risk_score": 75, "decision": "review"}',
-                "created_at": datetime.now().isoformat(),
-            },
-            {
-                "event_id": "EVT-003",
-                "event_type": "CASE_OPENED",
-                "actor": "fraud_analyst_1",
-                "payload_json": '{"confidence": "medium", "hypothesis": "account_takeover"}',
-                "created_at": datetime.now().isoformat(),
-            },
-        ]
-
-        for log in audit_logs:
-            cursor.execute(
-                """
-                INSERT INTO audit_log
-                (event_id, actor, event_type, payload_json, created_at)
-                VALUES (?, ?, ?, ?, ?)
-                """,
-                (log["event_id"], log["actor"], log["event_type"], log["payload_json"], log["created_at"]),
-            )
-
-    print("Database seeded successfully.")
-    print("   - 3 transactions")
-    print("   - 3 risk decisions")
-    print(f"   - {len(cases)} cases")
-    print("   - 3 audit log entries")
-    print("\nDatabase location: ./fraudops.db")
+            })
+    return txs
 
 
-def run_seed():
-    """Run the seed function and return result for API."""
-    seed_database()
-    return {
-        "transactions_created": 3,
-        "message": f"Database seeded successfully with {len(cases)} cases",
-    }
-
-
-def get_seed_queue():
-    """Return a list of sample transactions for simulation queue."""
-    return [
-        {
-            "timestamp": (datetime.now() - timedelta(minutes=i * 5)).isoformat(),
-            "type": "deposit" if i % 2 == 0 else "withdrawal",
-            "amount": 100.0 * (i + 1),
+def seed_fraudulent_transactions(cursor, start_dt: datetime) -> list[dict]:
+    """Generate ~60 fraudulent transactions that will score 40+ and trigger review."""
+    txs = []
+    
+    # Pattern 1: Velocity attacks (20 transactions)
+    for user_num in range(5):
+        user_id = f"user_fraud_vel_{user_num:02d}"
+        # 1 normal deposit
+        dt_dep = start_dt - timedelta(hours=random.uniform(24, 48))
+        txs.append({
+            "id": _rand_id(),
+            "timestamp": _ts(dt_dep),
+            "type": "deposit",
+            "amount": round(random.uniform(200, 400), 2),
             "currency": "USD",
-            "user_id": f"user_sim_{i}",
-            "account_age_days": 7 + i,
+            "user_id": user_id,
+            "account_age_days": 60,
             "country": "US",
-            "ip_hash": f"ip_sim_{i}",
-            "device_id": f"device_sim_{i}",
+            "ip_hash": f"ip_{user_id}_old",
+            "device_id": f"dev_{user_id}_old",
             "psp": "stripe",
             "status": "pending",
-        }
-        for i in range(5)
-    ]
+        })
+        
+        # 3 rapid withdrawals in 15 minutes (triggers velocity signal)
+        base = start_dt - timedelta(minutes=random.uniform(5, 60))
+        for i in range(3):
+            dt = base + timedelta(minutes=i * 5)
+            txs.append({
+                "id": _rand_id(),
+                "timestamp": _ts(dt),
+                "type": "withdrawal",
+                "amount": round(random.uniform(300, 700), 2),
+                "currency": "USD",
+                "user_id": user_id,
+                "account_age_days": 60,
+                "country": random.choice(["NG", "BR", "IN"]),  # geo change
+                "ip_hash": f"ip_{user_id}_new",
+                "device_id": f"dev_{user_id}_new",  # new device
+                "psp": "stripe",
+                "status": "pending",
+            })
+    
+    # Pattern 2: Large amount from young account (20 transactions)
+    for user_num in range(10):
+        user_id = f"user_fraud_young_{user_num:02d}"
+        # 1 historical transaction
+        dt_old = start_dt - timedelta(hours=random.uniform(72, 120))
+        txs.append({
+            "id": _rand_id(),
+            "timestamp": _ts(dt_old),
+            "type": "deposit",
+            "amount": round(random.uniform(50, 200), 2),
+            "currency": "USD",
+            "user_id": user_id,
+            "account_age_days": random.randint(1, 10),
+            "country": random.choice(COUNTRIES[:3]),
+            "ip_hash": f"ip_{user_id}",
+            "device_id": f"dev_{user_id}",
+            "psp": random.choice(PSPS[:2]),
+            "status": "pending",
+        })
+        
+        # Large suspicious transaction
+        dt = start_dt - timedelta(hours=random.uniform(1, 48))
+        txs.append({
+            "id": _rand_id(),
+            "timestamp": _ts(dt),
+            "type": random.choice(["deposit", "withdrawal"]),
+            "amount": round(random.uniform(1200, 5000), 2),  # large amount
+            "currency": "USD",
+            "user_id": user_id,
+            "account_age_days": random.randint(5, 25),  # young account (<30 days)
+            "country": random.choice(COUNTRIES),
+            "ip_hash": f"ip_{user_id}",
+            "device_id": f"dev_{user_id}",
+            "psp": random.choice(PSPS),
+            "status": "pending",
+        })
+    
+    return txs
+
+
+def insert_transactions(cursor, txs: list[dict]) -> None:
+    for t in txs:
+        cursor.execute(
+            """
+            INSERT OR IGNORE INTO transactions
+            (id, timestamp, type, amount, currency, user_id, account_age_days, country, ip_hash, device_id, psp, status)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            (
+                t["id"],
+                t["timestamp"],
+                t["type"],
+                t["amount"],
+                t["currency"],
+                t["user_id"],
+                t.get("account_age_days"),
+                t.get("country"),
+                t.get("ip_hash"),
+                t.get("device_id"),
+                t.get("psp"),
+                t.get("status", "pending"),
+            ),
+        )
+
+
+def run_seed() -> dict:
+    """Generate and insert 50% normal + 50% fraudulent transactions. Returns counts."""
+    print("Initializing database...")
+    init_db()
+    
+    # Clear all existing data before seeding
+    print("Clearing existing data...")
+    with get_cursor() as cur:
+        cur.execute("DELETE FROM audit_log")
+        cur.execute("DELETE FROM cases")
+        cur.execute("DELETE FROM risk_decisions")
+        cur.execute("DELETE FROM transactions")
+    
+    print("Generating synthetic transactions...")
+    start_dt = datetime.now(timezone.utc)
+    all_txs = []
+    
+    # Generate normal transactions (~65)
+    print("  - Normal users...")
+    all_txs.extend(seed_normal_users(None, start_dt))
+    
+    # Generate fraudulent transactions (~60)
+    print("  - Fraudulent patterns...")
+    all_txs.extend(seed_fraudulent_transactions(None, start_dt))
+    
+    # Sort by timestamp
+    all_txs.sort(key=lambda t: t["timestamp"])
+
+    print(f"\nInserting {len(all_txs)} transactions (50% normal, 50% fraudulent)...")
+    with get_cursor() as cur:
+        insert_transactions(cur, all_txs)
+    
+    print(f"✅ Seed completed: {len(all_txs)} transactions created")
+    print(f"  ~50% should be approved, ~50% should trigger review/block")
+    return {"transactions_created": len(all_txs), "message": "Seed completed."}
+
+
+def get_seed_queue() -> list[dict]:
+    """Return transactions for simulation queue."""
+    with get_cursor() as cur:
+        cur.execute(
+            """
+            SELECT id, timestamp, type, amount, currency, user_id, account_age_days, country, ip_hash, device_id, psp, status
+            FROM transactions
+            ORDER BY RANDOM()
+            LIMIT 100
+            """
+        )
+        rows = cur.fetchall()
+    return [dict(r) for r in rows]
 
 
 if __name__ == "__main__":
-    seed_database()
+    result = run_seed()
+    print(f"\n{result['message']}")
+
