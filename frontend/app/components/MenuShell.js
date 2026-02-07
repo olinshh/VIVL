@@ -197,10 +197,11 @@ export default function MenuShell({ children }) {
 
       <div
         style={{
-          minHeight: '100vh',
+          height: '100svh',
           paddingTop: 64,
           background: 'radial-gradient(circle at top, #fdf8f5 0%, #f1e6de 45%, #ffffff 100%)',
           overflow: 'hidden',
+          boxSizing: 'border-box',
         }}
       >
         {children}

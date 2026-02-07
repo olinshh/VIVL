@@ -1,33 +1,27 @@
-'use client'
-
-import { useEffect, useState } from 'react'
+import Link from 'next/link'
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || 'http://localhost:8000'
 
-export default function CasesPage() {
-  const [cases, setCases] = useState([])
-  const [error, setError] = useState('')
+async function getCases() {
+  const res = await fetch(`${API_BASE}/cases`, { cache: 'no-store' })
+  if (!res.ok) throw new Error('Failed to load cases')
+  const data = await res.json()
+  const all = Array.isArray(data) ? data : []
+  return all.filter((item) => (item.status || 'open') === 'open')
+}
 
-  useEffect(() => {
-    let isMounted = true
-    fetch(`${API_BASE}/cases`)
-      .then((res) => {
-        if (!res.ok) throw new Error('Failed to load cases')
-        return res.json()
-      })
-      .then((data) => {
-        if (isMounted) setCases(Array.isArray(data) ? data : [])
-      })
-      .catch((err) => {
-        if (isMounted) setError(err.message || 'Failed to load cases')
-      })
-    return () => {
-      isMounted = false
-    }
-  }, [])
+
+export default async function CasesPage() {
+  let cases = []
+  let error = ''
+  try {
+    cases = await getCases()
+  } catch (err) {
+    error = err?.message || 'Failed to load cases'
+  }
 
   return (
-    <main style={{ minHeight: '100vh', padding: 24 }}>
+    <main style={{ height: 'calc(100svh - 64px)', padding: 24, boxSizing: 'border-box' }}>
       <div
         style={{
           position: 'relative',
@@ -36,11 +30,29 @@ export default function CasesPage() {
           placeItems: 'center',
         }}
       >
+        <Link
+          href="/"
+          style={{
+            position: 'absolute',
+            right: 24,
+            top: 16,
+            padding: '6px 12px',
+            borderRadius: 999,
+            border: '1px solid #ead8d0',
+            background: '#fffbf7',
+            color: '#7a4a3a',
+            textDecoration: 'none',
+            fontSize: 12,
+            fontWeight: 600,
+          }}
+        >
+          Back
+        </Link>
         <div
           style={{
             position: 'absolute',
             left: 24,
-            top: 12,
+            top: 16,
             textAlign: 'left',
           }}
         >
@@ -65,26 +77,23 @@ export default function CasesPage() {
             boxShadow: '0 22px 40px rgba(160, 110, 90, 0.12)',
           }}
         >
-          {error && (
-            <div style={{ padding: 12, color: '#b0412f' }}>
-              {error}
-            </div>
-          )}
-          {!error && cases.length === 0 && (
-            <div style={{ padding: 12, color: '#a1705a' }}>
-              No pending cases yet.
-            </div>
-          )}
+          {error && <div style={{ padding: 12, color: '#b0412f' }}>{error}</div>}
+          {!error && cases.length === 0 && <div style={{ padding: 12, color: '#a1705a' }}>No pending cases yet.</div>}
           {cases.map((item, index) => (
-            <div
+            <Link
               key={item.case_id || index}
+              href={`/cases/${item.case_id}`}
+              className="case-card"
               style={{
+                display: 'block',
                 padding: '18px 20px',
                 borderRadius: 18,
                 background: '#fffbf7',
-                border: '1px solid #e2cfc4',
+                border: '2px solid #e2cfc4',
                 boxShadow: `0 ${10 + index * 2}px ${18 + index * 2}px rgba(160, 110, 90, 0.14)`,
                 transform: `translateY(${index * 3}px)`,
+                textDecoration: 'none',
+                transition: 'transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease, background 160ms ease',
               }}
             >
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -111,10 +120,18 @@ export default function CasesPage() {
               <div style={{ fontSize: 12, color: '#a1705a', marginTop: 2 }}>
                 Created: {item.created_at || '—'}
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       </div>
+      <style>{`
+        .case-card:hover {
+          transform: translateY(-4px) scale(1.01);
+          box-shadow: 0 18px 28px rgba(160, 110, 90, 0.22);
+          border-color: #d86b2f;
+          background: #fff1e6;
+        }
+      `}</style>
     </main>
   )
 }
