@@ -1,14 +1,59 @@
-# VIVL
+# VIVL — Local Setup Guide
 
-### Real-Time Fraud Intelligence Layer
+This guide walks you through running the backend + frontend locally.
 
-**VIVL** is an AI-powered fraud intelligence layer for banks and financial services. It integrates into transaction processing as a decision-support system that scores risk in real time, produces **explainable decisions** (APPROVE / REVIEW / BLOCK), and generates **investigation case files** when needed.
+## Prereqs
+- Python 3.11+
+- Node.js 18+
 
-**What it does**
-- Ingests live or simulated transaction streams
-- Combines a trained LLM with historical context for risk analysis
-- Outputs decisions with an auditable rationale
-- Creates full investigation packs for REVIEW/BLOCK cases
-- Maintains an append-only audit log for compliance
+## 1) Backend
+From the repo root:
 
-VIVL does **not** replace a bank’s core payments stack; it adds an intelligence layer that reduces manual work, speeds investigations, and improves auditability.
+```powershell
+cd backend
+python -m venv .venv
+.\.venv\Scripts\python -m pip install -r requirements.txt
+```
+
+Create `backend/.env` (example below):
+```
+GEMINI_API_KEY=your_key_here
+GEMINI_MODEL=gemini-2.5-flash
+DATABASE_PATH=./fraudops.db
+```
+
+Seed the database:
+```powershell
+.\.venv\Scripts\python seed.py
+```
+
+Start the API:
+```powershell
+.\.venv\Scripts\python -m uvicorn main:app --reload --port 8000
+```
+
+API should be available at:
+```
+http://localhost:8000
+```
+
+## 2) Frontend
+In a new terminal:
+
+```powershell
+cd frontend
+npm install
+npm run dev
+```
+
+Open the app at:
+```
+http://localhost:3000
+```
+
+## Notes
+- If you change DB schema, delete `backend/fraudops.db` and re-run `seed.py`.
+- Set `NEXT_PUBLIC_API_BASE` if your backend runs on a different host/port:
+```
+NEXT_PUBLIC_API_BASE=http://localhost:8000
+```

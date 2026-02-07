@@ -199,12 +199,38 @@ export default function MenuShell({ children }) {
         style={{
           height: '100svh',
           paddingTop: 64,
-          background: 'radial-gradient(circle at top, #fdf8f5 0%, #f1e6de 45%, #ffffff 100%)',
+          background:
+            'radial-gradient(circle at top, #fdf8f5 0%, #f1e6de 45%, #ffffff 100%)',
           overflow: 'hidden',
           boxSizing: 'border-box',
+          position: 'relative',
         }}
       >
-        {children}
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            backgroundImage:
+              'radial-gradient(40% 40% at 10% 20%, rgba(255, 233, 210, 0.95) 0%, rgba(255, 233, 210, 0) 70%),' +
+              'radial-gradient(45% 45% at 90% 80%, rgba(255, 210, 170, 0.9) 0%, rgba(255, 210, 170, 0) 75%)',
+            backgroundSize: '200% 200%',
+            backgroundPosition: '0% 0%',
+            opacity: 0.9,
+            animation: 'shine-sweep 14s linear infinite',
+            pointerEvents: 'none',
+            zIndex: 0,
+          }}
+        />
+        <div style={{ position: 'relative', zIndex: 1, height: '100%' }}>
+          {children}
+        </div>
+        <style>{`
+          @keyframes shine-sweep {
+            0% { background-position: 0% 0%; }
+            50% { background-position: 100% 80%; }
+            100% { background-position: 0% 0%; }
+          }
+        `}</style>
       </div>
     </>
   )
