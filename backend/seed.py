@@ -1,240 +1,219 @@
-# this file puts some made up data in the data base
-
-"""Seed the database with sample data."""
+"""Seed the database with sample data aligned to case_service.py."""
 from datetime import datetime, timedelta
 import uuid
+
 from db import init_db, get_cursor
+
 
 def seed_database():
     """Create tables and insert sample data."""
     print("Initializing database...")
     init_db()
-    
+
     print("Inserting sample data...")
-    
+
     with get_cursor() as cursor:
-        # Sample transactions
+        # Sample transactions (schema aligned with db.py + case_service.py)
         transactions = [
             {
-                'id': str(uuid.uuid4()),
-                'transaction_id': 'TXN-001',
-                'timestamp': (datetime.now() - timedelta(hours=2)).isoformat(),
-                'amount': 1500.00,
-                'currency': 'USD',
-                'user_id': 'user_123',
-                'user_email': 'john.doe@example.com',
-                'user_name': 'John Doe',
-                'device_id': 'device_abc123',
-                'device_type': 'mobile',
-                'ip_address': '192.168.1.100',
-                'status': 'completed',
-                'merchant_id': 'merch_001',
-                'merchant_name': 'Online Store XYZ',
-                'location': 'New York, US',
-                'created_at': datetime.now().isoformat()
+                "id": str(uuid.uuid4()),
+                "timestamp": (datetime.now() - timedelta(hours=2)).isoformat(),
+                "type": "deposit",
+                "amount": 1500.00,
+                "currency": "USD",
+                "user_id": "user_123",
+                "account_age_days": 240,
+                "country": "US",
+                "ip_hash": "ip_abc123",
+                "device_id": "device_abc123",
+                "psp": "stripe",
+                "status": "pending",
             },
             {
-                'id': str(uuid.uuid4()),
-                'transaction_id': 'TXN-002',
-                'timestamp': (datetime.now() - timedelta(hours=1)).isoformat(),
-                'amount': 5000.00,
-                'currency': 'EUR',
-                'user_id': 'user_456',
-                'user_email': 'jane.smith@example.com',
-                'user_name': 'Jane Smith',
-                'device_id': 'device_xyz789',
-                'device_type': 'desktop',
-                'ip_address': '10.0.0.50',
-                'status': 'pending',
-                'merchant_id': 'merch_002',
-                'merchant_name': 'Tech Gadgets Inc',
-                'location': 'London, UK',
-                'created_at': datetime.now().isoformat()
+                "id": str(uuid.uuid4()),
+                "timestamp": (datetime.now() - timedelta(hours=1)).isoformat(),
+                "type": "withdrawal",
+                "amount": 5000.00,
+                "currency": "EUR",
+                "user_id": "user_456",
+                "account_age_days": 30,
+                "country": "UK",
+                "ip_hash": "ip_xyz789",
+                "device_id": "device_xyz789",
+                "psp": "adyen",
+                "status": "pending",
             },
             {
-                'id': str(uuid.uuid4()),
-                'transaction_id': 'TXN-003',
-                'timestamp': (datetime.now() - timedelta(minutes=30)).isoformat(),
-                'amount': 250.50,
-                'currency': 'USD',
-                'user_id': 'user_789',
-                'user_email': 'bob.johnson@example.com',
-                'user_name': 'Bob Johnson',
-                'device_id': 'device_def456',
-                'device_type': 'mobile',
-                'ip_address': '172.16.0.10',
-                'status': 'flagged',
-                'merchant_id': 'merch_003',
-                'merchant_name': 'Gaming Store',
-                'location': 'Los Angeles, US',
-                'created_at': datetime.now().isoformat()
-            }
+                "id": str(uuid.uuid4()),
+                "timestamp": (datetime.now() - timedelta(minutes=30)).isoformat(),
+                "type": "transfer",
+                "amount": 250.50,
+                "currency": "USD",
+                "user_id": "user_789",
+                "account_age_days": 5,
+                "country": "US",
+                "ip_hash": "ip_def456",
+                "device_id": "device_def456",
+                "psp": "paypal",
+                "status": "pending",
+            },
         ]
-        
+
         for txn in transactions:
-            cursor.execute('''
-                INSERT INTO transactions 
-                (id, transaction_id, timestamp, amount, currency, user_id, user_email, 
-                user_name, device_id, device_type, ip_address, status, merchant_id, 
-                merchant_name, location, created_at)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            ''', (txn['id'], txn['transaction_id'], txn['timestamp'], txn['amount'],
-                  txn['currency'], txn['user_id'], txn['user_email'], txn['user_name'],
-                  txn['device_id'], txn['device_type'], txn['ip_address'], txn['status'],
-                  txn['merchant_id'], txn['merchant_name'], txn['location'], txn['created_at']))
-        
+            cursor.execute(
+                """
+                INSERT INTO transactions
+                (id, timestamp, type, amount, currency, user_id, account_age_days,
+                 country, ip_hash, device_id, psp, status)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    txn["id"],
+                    txn["timestamp"],
+                    txn["type"],
+                    txn["amount"],
+                    txn["currency"],
+                    txn["user_id"],
+                    txn["account_age_days"],
+                    txn["country"],
+                    txn["ip_hash"],
+                    txn["device_id"],
+                    txn["psp"],
+                    txn["status"],
+                ),
+            )
+
         # Sample risk decisions
+        created_at = datetime.now().isoformat()
         risk_decisions = [
             {
-                'id': str(uuid.uuid4()),
-                'transaction_id': 'TXN-001',
-                'risk_score': 15.5,
-                'risk_level': 'low',
-                'decision': 'approve',
-                'reason': 'Normal transaction pattern',
-                'signals_json': '{"velocity": "normal", "location_match": true}',
-                'model_version': 'v1.2.3',
-                'llm_rationale': 'Transaction amount and pattern consistent with user history',
-                'timestamp': datetime.now().isoformat(),
-                'created_at': datetime.now().isoformat()
+                "id": str(uuid.uuid4()),
+                "transaction_id": transactions[0]["id"],
+                "risk_score": 15,
+                "decision": "approve",
+                "signals_json": '{"velocity": "normal", "location_match": true}',
+                "llm_rationale": "Transaction amount and pattern consistent with user history",
+                "created_at": created_at,
             },
             {
-                'id': str(uuid.uuid4()),
-                'transaction_id': 'TXN-002',
-                'risk_score': 75.2,
-                'risk_level': 'high',
-                'decision': 'review',
-                'reason': 'Unusual amount for this user',
-                'signals_json': '{"velocity": "high", "location_match": false, "amount_anomaly": true}',
-                'model_version': 'v1.2.3',
-                'llm_rationale': 'Large transaction from new location requires manual review',
-                'timestamp': datetime.now().isoformat(),
-                'created_at': datetime.now().isoformat()
+                "id": str(uuid.uuid4()),
+                "transaction_id": transactions[1]["id"],
+                "risk_score": 75,
+                "decision": "review",
+                "signals_json": '{"velocity": "high", "location_match": false, "amount_anomaly": true}',
+                "llm_rationale": "Large transaction from new location requires manual review",
+                "created_at": created_at,
             },
             {
-                'id': str(uuid.uuid4()),
-                'transaction_id': 'TXN-003',
-                'risk_score': 92.8,
-                'risk_level': 'critical',
-                'decision': 'block',
-                'reason': 'Multiple fraud indicators detected',
-                'signals_json': '{"velocity": "very_high", "device_mismatch": true, "vpn_detected": true}',
-                'model_version': 'v1.2.3',
-                'llm_rationale': 'Device fingerprint mismatch and VPN usage from high-risk location',
-                'timestamp': datetime.now().isoformat(),
-                'created_at': datetime.now().isoformat()
-            }
+                "id": str(uuid.uuid4()),
+                "transaction_id": transactions[2]["id"],
+                "risk_score": 93,
+                "decision": "block",
+                "signals_json": '{"velocity": "very_high", "device_mismatch": true, "vpn_detected": true}',
+                "llm_rationale": "Device fingerprint mismatch and VPN usage from high-risk location",
+                "created_at": created_at,
+            },
         ]
-        
+
         for risk in risk_decisions:
-            cursor.execute('''
-                INSERT INTO risk_decisions 
-                (id, transaction_id, risk_score, risk_level, decision, reason, 
-                signals_json, model_version, llm_rationale, timestamp, created_at)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            ''', (risk['id'], risk['transaction_id'], risk['risk_score'], risk['risk_level'],
-                  risk['decision'], risk['reason'], risk['signals_json'], risk['model_version'],
-                  risk['llm_rationale'], risk['timestamp'], risk['created_at']))
-        
+            cursor.execute(
+                """
+                INSERT INTO risk_decisions
+                (id, transaction_id, risk_score, decision, signals_json, llm_rationale, created_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    risk["id"],
+                    risk["transaction_id"],
+                    risk["risk_score"],
+                    risk["decision"],
+                    risk["signals_json"],
+                    risk["llm_rationale"],
+                    risk["created_at"],
+                ),
+            )
+
         # Sample cases
-        cases = [
-            {
-                'id': str(uuid.uuid4()),
-                'case_id': 'CASE-2026-001',
-                'transaction_id': 'TXN-003',
-                'status': 'investigating',
-                'priority': 'high',
-                'confidence': 'medium',
-                'hypothesis': 'Possible account takeover',
-                'hypothesis_json': '{"type": "account_takeover", "indicators": ["device_change", "location_change"]}',
-                'evidence': 'Device mismatch, VPN usage, unusual location',
-                'evidence_json': '{"device_match": false, "vpn": true, "location_risk": "high"}',
-                'timeline_json': '{"events": [{"time": "2026-02-07T10:00:00", "event": "suspicious_login"}]}',
-                'recommendations_json': '{"actions": ["contact_user", "freeze_account"]}',
-                'investigation_suggestions_json': '{"next_steps": ["verify_user_identity", "check_recent_activity"]}',
-                'assigned_to': 'fraud_analyst_1',
-                'created_at': datetime.now().isoformat(),
-                'updated_at': datetime.now().isoformat(),
-                'resolution': None
-            }
-        ]
-        
+        cases = []
+        for i in range(6):
+            cases.append(
+                {
+                    "case_id": f"CASE-2026-00{i + 1}",
+                    "primary_transaction_id": transactions[i % len(transactions)]["id"],
+                    "status": "open",
+                    "confidence": "medium" if i % 2 == 0 else "high",
+                    "hypothesis_json": '[{"title": "Potential fraud pattern", "why": "Unusual behavior detected"}]',
+                    "evidence_json": '[{"item": "Signal anomalies", "transaction_ids": []}]',
+                    "timeline_json": '[{"timestamp": "2026-02-07T10:00:00", "event": "Flagged activity"}]',
+                    "recommendations_json": '[{"action": "Manual review", "reason": "Validate identity and intent"}]',
+                    "investigation_suggestions_json": '["Check linked accounts", "Review IP/device history"]',
+                    "created_at": datetime.now().isoformat(),
+                }
+            )
+
         for case in cases:
-            cursor.execute('''
-                INSERT INTO cases 
-                (id, case_id, transaction_id, status, priority, confidence, hypothesis, 
-                hypothesis_json, evidence, evidence_json, timeline_json, recommendations_json,
-                investigation_suggestions_json, assigned_to, created_at, updated_at, resolution)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            ''', (case['id'], case['case_id'], case['transaction_id'], case['status'],
-                  case['priority'], case['confidence'], case['hypothesis'], case['hypothesis_json'],
-                  case['evidence'], case['evidence_json'], case['timeline_json'],
-                  case['recommendations_json'], case['investigation_suggestions_json'],
-                  case['assigned_to'], case['created_at'], case['updated_at'], case['resolution']))
-        
+            cursor.execute(
+                """
+                INSERT INTO cases
+                (case_id, primary_transaction_id, status, confidence, hypothesis_json,
+                 evidence_json, timeline_json, recommendations_json, investigation_suggestions_json, created_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    case["case_id"],
+                    case["primary_transaction_id"],
+                    case["status"],
+                    case["confidence"],
+                    case["hypothesis_json"],
+                    case["evidence_json"],
+                    case["timeline_json"],
+                    case["recommendations_json"],
+                    case["investigation_suggestions_json"],
+                    case["created_at"],
+                ),
+            )
+
         # Sample audit log
         audit_logs = [
             {
-                'id': str(uuid.uuid4()),
-                'event_id': 'EVT-001',
-                'event_type': 'TRANSACTION_CREATED',
-                'actor': 'system',
-                'action': 'create',
-                'resource_type': 'transaction',
-                'resource_id': 'TXN-001',
-                'details': 'Transaction created successfully',
-                'payload_json': '{"amount": 1500.00, "currency": "USD"}',
-                'timestamp': datetime.now().isoformat(),
-                'created_at': datetime.now().isoformat(),
-                'ip_address': '192.168.1.100'
+                "event_id": "EVT-001",
+                "event_type": "TRANSACTION_CREATED",
+                "actor": "system",
+                "payload_json": '{"amount": 1500.00, "currency": "USD"}',
+                "created_at": datetime.now().isoformat(),
             },
             {
-                'id': str(uuid.uuid4()),
-                'event_id': 'EVT-002',
-                'event_type': 'RISK_ASSESSMENT',
-                'actor': 'fraud_engine',
-                'action': 'assess',
-                'resource_type': 'risk_decision',
-                'resource_id': 'TXN-002',
-                'details': 'Risk assessment completed',
-                'payload_json': '{"risk_score": 75.2, "decision": "review"}',
-                'timestamp': datetime.now().isoformat(),
-                'created_at': datetime.now().isoformat(),
-                'ip_address': '10.0.0.1'
+                "event_id": "EVT-002",
+                "event_type": "RISK_ASSESSMENT",
+                "actor": "fraud_engine",
+                "payload_json": '{"risk_score": 75, "decision": "review"}',
+                "created_at": datetime.now().isoformat(),
             },
             {
-                'id': str(uuid.uuid4()),
-                'event_id': 'EVT-003',
-                'event_type': 'CASE_OPENED',
-                'actor': 'fraud_analyst_1',
-                'action': 'create',
-                'resource_type': 'case',
-                'resource_id': 'CASE-2026-001',
-                'details': 'Investigation case opened',
-                'payload_json': '{"priority": "high", "hypothesis": "account_takeover"}',
-                'timestamp': datetime.now().isoformat(),
-                'created_at': datetime.now().isoformat(),
-                'ip_address': '10.0.0.50'
-            }
+                "event_id": "EVT-003",
+                "event_type": "CASE_OPENED",
+                "actor": "fraud_analyst_1",
+                "payload_json": '{"confidence": "medium", "hypothesis": "account_takeover"}',
+                "created_at": datetime.now().isoformat(),
+            },
         ]
-        
+
         for log in audit_logs:
-            cursor.execute('''
-                INSERT INTO audit_log 
-                (id, event_id, event_type, actor, action, resource_type, resource_id,
-                details, payload_json, timestamp, created_at, ip_address)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            ''', (log['id'], log['event_id'], log['event_type'], log['actor'], log['action'],
-                  log['resource_type'], log['resource_id'], log['details'], log['payload_json'],
-                  log['timestamp'], log['created_at'], log['ip_address']))
-    
-    print("✅ Database seeded successfully!")
-    print(f"   - 3 transactions")
-    print(f"   - 3 risk decisions")
-    print(f"   - 1 case")
-    print(f"   - 3 audit log entries")
-    print(f"\n📂 Database location: ./fraudops.db")
-    print(f"   You can now open this file in SQLite Viewer!")
+            cursor.execute(
+                """
+                INSERT INTO audit_log
+                (event_id, actor, event_type, payload_json, created_at)
+                VALUES (?, ?, ?, ?, ?)
+                """,
+                (log["event_id"], log["actor"], log["event_type"], log["payload_json"], log["created_at"]),
+            )
+
+    print("Database seeded successfully.")
+    print("   - 3 transactions")
+    print("   - 3 risk decisions")
+    print(f"   - {len(cases)} cases")
+    print("   - 3 audit log entries")
+    print("\nDatabase location: ./fraudops.db")
 
 
 def run_seed():
@@ -242,7 +221,7 @@ def run_seed():
     seed_database()
     return {
         "transactions_created": 3,
-        "message": "Database seeded successfully with sample data"
+        "message": f"Database seeded successfully with {len(cases)} cases",
     }
 
 
@@ -250,22 +229,21 @@ def get_seed_queue():
     """Return a list of sample transactions for simulation queue."""
     return [
         {
-            'transaction_id': f'TXN-SIM-{i:03d}',
-            'amount': 100.0 * (i + 1),
-            'currency': 'USD',
-            'user_id': f'user_sim_{i}',
-            'user_email': f'user{i}@example.com',
-            'user_name': f'Sim User {i}',
-            'device_id': f'device_sim_{i}',
-            'device_type': 'mobile' if i % 2 == 0 else 'desktop',
-            'ip_address': f'192.168.1.{100 + i}',
-            'merchant_id': f'merch_sim_{i % 3}',
-            'merchant_name': f'Merchant {i % 3}',
-            'location': 'US'
+            "timestamp": (datetime.now() - timedelta(minutes=i * 5)).isoformat(),
+            "type": "deposit" if i % 2 == 0 else "withdrawal",
+            "amount": 100.0 * (i + 1),
+            "currency": "USD",
+            "user_id": f"user_sim_{i}",
+            "account_age_days": 7 + i,
+            "country": "US",
+            "ip_hash": f"ip_sim_{i}",
+            "device_id": f"device_sim_{i}",
+            "psp": "stripe",
+            "status": "pending",
         }
         for i in range(5)
     ]
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     seed_database()
