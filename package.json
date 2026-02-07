@@ -1,0 +1,11 @@
+{
+  "name": "vivl",
+  "version": "0.1.0",
+  "description": "VIVL - deriv.ai hackathon project",
+  "scripts": {
+    "dev": "cd frontend && npm install && npm run dev",
+    "install-fe": "cd frontend && npm install",
+    "build": "cd frontend && npm run build",
+    "start": "cd frontend && npm run start"
+  }
+}
