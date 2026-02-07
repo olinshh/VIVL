@@ -3,7 +3,7 @@
 """Seed the database with sample data."""
 from datetime import datetime, timedelta
 import uuid
-from VIVL.backend.db import init_db, get_cursor
+from db import init_db, get_cursor
 
 def seed_database():
     """Create tables and insert sample data."""
@@ -235,6 +235,37 @@ def seed_database():
     print(f"   - 3 audit log entries")
     print(f"\n📂 Database location: ./fraudops.db")
     print(f"   You can now open this file in SQLite Viewer!")
+
+
+def run_seed():
+    """Run the seed function and return result for API."""
+    seed_database()
+    return {
+        "transactions_created": 3,
+        "message": "Database seeded successfully with sample data"
+    }
+
+
+def get_seed_queue():
+    """Return a list of sample transactions for simulation queue."""
+    return [
+        {
+            'transaction_id': f'TXN-SIM-{i:03d}',
+            'amount': 100.0 * (i + 1),
+            'currency': 'USD',
+            'user_id': f'user_sim_{i}',
+            'user_email': f'user{i}@example.com',
+            'user_name': f'Sim User {i}',
+            'device_id': f'device_sim_{i}',
+            'device_type': 'mobile' if i % 2 == 0 else 'desktop',
+            'ip_address': f'192.168.1.{100 + i}',
+            'merchant_id': f'merch_sim_{i % 3}',
+            'merchant_name': f'Merchant {i % 3}',
+            'location': 'US'
+        }
+        for i in range(5)
+    ]
+
 
 if __name__ == '__main__':
     seed_database()
