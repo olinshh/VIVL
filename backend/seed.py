@@ -3,7 +3,7 @@
 """Seed the database with sample data."""
 from datetime import datetime, timedelta
 import uuid
-from db import init_db, get_cursor
+from VIVL.backend.db import init_db, get_cursor
 
 def seed_database():
     """Create tables and insert sample data."""
