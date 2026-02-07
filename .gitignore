@@ -49,3 +49,6 @@ yarn-error.log*
 *.bak
 .venv/
 venv/
+
+#Db
+*.db
