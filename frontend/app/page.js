@@ -107,116 +107,166 @@ export default function Home() {
   }
 
   const getDecisionColor = (decision) => {
-    if (decision === 'approve') return '#2d7a4a'
-    if (decision === 'review') return '#b87a3a'
-    if (decision === 'block') return '#c24444'
-    return '#7a4a3a'
+    if (decision === 'approve') return '#22c55e'
+    if (decision === 'review') return '#eab308'
+    if (decision === 'block') return '#ef4444'
+    return '#64748b'
   }
 
   const getDecisionBg = (decision) => {
-    if (decision === 'approve') return '#e8f5ec'
-    if (decision === 'review') return '#fff4e6'
-    if (decision === 'block') return '#ffe8e8'
-    return '#fffbf7'
+    if (decision === 'approve') return 'rgba(22, 163, 74, 0.15)'
+    if (decision === 'review') return 'rgba(234, 179, 8, 0.15)'
+    if (decision === 'block') return 'rgba(239, 68, 68, 0.15)'
+    return 'rgba(51, 65, 85, 0.3)'
   }
 
   return (
-    <main style={{ height: 'calc(100svh - 64px)', padding: 24, boxSizing: 'border-box', overflow: 'auto' }}>
+    <main style={{ height: 'calc(100svh - 64px)', padding: 32, boxSizing: 'border-box', overflow: 'auto' }}>
       <section
         style={{
-          maxWidth: 980,
+          maxWidth: 1200,
           margin: '0 auto',
-          background: 'rgba(255, 252, 248, 0.7)',
-          border: '1px solid rgba(226, 207, 196, 0.6)',
-          borderRadius: 24,
-          padding: 24,
-          boxShadow: '0 22px 40px rgba(160, 110, 90, 0.12)',
+          background: 'rgba(15, 23, 42, 0.97)',
+          border: '1px solid rgba(71, 85, 105, 0.5)',
+          borderRadius: 16,
+          padding: 32,
+          boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5), 0 0 100px rgba(59, 130, 246, 0.1)',
+          backdropFilter: 'blur(20px)',
         }}
       >
-        <h1 style={{ margin: 0, fontSize: 28, color: '#7a4a3a' }}>VIVL — Real-Time Fraud Intelligence Layer</h1>
-        <p style={{ margin: '10px 0 0', color: '#a1705a', fontSize: 14, lineHeight: 1.6 }}>
-          VIVL integrates into transaction processing as a decision-support system that scores risk in real time,
-          produces explainable decisions (APPROVE / REVIEW / BLOCK), and generates investigation case files when needed.
-        </p>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 12 }}>
+          <div style={{ 
+            width: 48, 
+            height: 48, 
+            borderRadius: 12, 
+            background: 'linear-gradient(135deg, #3b82f6 0%, #1e40af 100%)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: 24,
+            boxShadow: '0 8px 24px rgba(59, 130, 246, 0.3)'
+          }}>🛡️</div>
+          <div>
+            <h1 style={{ margin: 0, fontSize: 32, fontWeight: 700, background: 'linear-gradient(135deg, #60a5fa 0%, #3b82f6 50%, #2563eb 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', letterSpacing: '-0.5px' }}>VIVL — Real-Time Fraud Intelligence</h1>
+            <p style={{ margin: '4px 0 0', color: '#94a3b8', fontSize: 14, lineHeight: 1.4 }}>
+              AI-powered transaction monitoring • Explainable decisions • Automated case generation
+            </p>
+          </div>
+        </div>
 
         {/* Auto-Seeding Controls */}
-        <div style={{ marginTop: 20, padding: 16, background: '#fffbf7', borderRadius: 12, border: '1px solid #e2cfc4' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-            <h3 style={{ margin: 0, fontSize: 16, color: '#7a4a3a' }}>🤖 Auto-Fraud Detection Test</h3>
+        <div style={{ marginTop: 24, padding: 24, background: 'linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(15, 23, 42, 0.95) 100%)', borderRadius: 16, border: '1px solid rgba(71, 85, 105, 0.4)', boxShadow: '0 10px 40px rgba(0, 0, 0, 0.3)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <div style={{ width: 8, height: 8, borderRadius: '50%', background: isRunning ? '#22c55e' : '#64748b', boxShadow: isRunning ? '0 0 12px #22c55e' : 'none', animation: isRunning ? 'pulse 2s infinite' : 'none' }} />
+              <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: '#f1f5f9' }}>Live Transaction Monitor</h3>
+            </div>
             <button
               onClick={isRunning ? stopSeeding : startAutoSeeding}
               disabled={isRunning && results.length === 0}
               style={{
-                padding: '8px 16px',
+                padding: '10px 24px',
                 borderRadius: 8,
                 border: 'none',
-                background: isRunning ? '#c24444' : '#5a8a6a',
+                background: isRunning ? 'linear-gradient(135deg, #dc2626 0%, #991b1b 100%)' : 'linear-gradient(135deg, #3b82f6 0%, #1e40af 100%)',
                 color: 'white',
                 fontWeight: 600,
                 cursor: 'pointer',
-                fontSize: 14
+                fontSize: 14,
+                boxShadow: isRunning ? '0 4px 16px rgba(220, 38, 38, 0.4)' : '0 4px 16px rgba(59, 130, 246, 0.4)',
+                transition: 'all 0.2s',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8
               }}
+              onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
+              onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
             >
-              {isRunning ? '⏸ Stop' : '▶ Start Auto-Seeding'}
+              {isRunning ? '⏹' : '▶'} {isRunning ? 'Stop Analysis' : 'Start Analysis'}
             </button>
           </div>
 
           {/* Stats */}
           {stats.total > 0 && (
-            <div style={{ display: 'flex', gap: 12, marginBottom: 12 }}>
-              <div style={{ flex: 1, padding: 8, background: '#f5f5f5', borderRadius: 8, textAlign: 'center' }}>
-                <div style={{ fontSize: 20, fontWeight: 700, color: '#7a4a3a' }}>{stats.total}</div>
-                <div style={{ fontSize: 11, color: '#a87a64' }}>Total</div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 20 }}>
+              <div style={{ padding: 16, background: 'rgba(51, 65, 85, 0.4)', borderRadius: 12, textAlign: 'center', border: '1px solid rgba(71, 85, 105, 0.3)' }}>
+                <div style={{ fontSize: 28, fontWeight: 700, background: 'linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>{stats.total}</div>
+                <div style={{ fontSize: 11, color: '#94a3b8', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px', marginTop: 4 }}>Total Processed</div>
               </div>
-              <div style={{ flex: 1, padding: 8, background: '#e8f5ec', borderRadius: 8, textAlign: 'center' }}>
-                <div style={{ fontSize: 20, fontWeight: 700, color: '#2d7a4a' }}>{stats.approve}</div>
-                <div style={{ fontSize: 11, color: '#2d7a4a' }}>Approved</div>
+              <div style={{ padding: 16, background: 'rgba(22, 163, 74, 0.1)', borderRadius: 12, textAlign: 'center', border: '1px solid rgba(34, 197, 94, 0.3)' }}>
+                <div style={{ fontSize: 28, fontWeight: 700, color: '#22c55e' }}>{stats.approve}</div>
+                <div style={{ fontSize: 11, color: '#86efac', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px', marginTop: 4 }}>Approved</div>
               </div>
-              <div style={{ flex: 1, padding: 8, background: '#fff4e6', borderRadius: 8, textAlign: 'center' }}>
-                <div style={{ fontSize: 20, fontWeight: 700, color: '#b87a3a' }}>{stats.review}</div>
-                <div style={{ fontSize: 11, color: '#b87a3a' }}>Review</div>
+              <div style={{ padding: 16, background: 'rgba(234, 179, 8, 0.1)', borderRadius: 12, textAlign: 'center', border: '1px solid rgba(234, 179, 8, 0.3)' }}>
+                <div style={{ fontSize: 28, fontWeight: 700, color: '#eab308' }}>{stats.review}</div>
+                <div style={{ fontSize: 11, color: '#fde047', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px', marginTop: 4 }}>Under Review</div>
               </div>
-              <div style={{ flex: 1, padding: 8, background: '#ffe8e8', borderRadius: 8, textAlign: 'center' }}>
-                <div style={{ fontSize: 20, fontWeight: 700, color: '#c24444' }}>{stats.block}</div>
-                <div style={{ fontSize: 11, color: '#c24444' }}>Blocked</div>
+              <div style={{ padding: 16, background: 'rgba(220, 38, 38, 0.1)', borderRadius: 12, textAlign: 'center', border: '1px solid rgba(239, 68, 68, 0.3)' }}>
+                <div style={{ fontSize: 28, fontWeight: 700, color: '#ef4444' }}>{stats.block}</div>
+                <div style={{ fontSize: 11, color: '#fca5a5', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px', marginTop: 4 }}>Blocked</div>
               </div>
             </div>
           )}
 
           {/* Results */}
           {results.length > 0 && (
-            <div style={{ maxHeight: 300, overflowY: 'auto' }}>
+            <div style={{ maxHeight: 360, overflowY: 'auto', paddingRight: 8 }}>
               {results.map((result, idx) => (
                 <div
                   key={idx}
                   style={{
-                    padding: 10,
-                    marginBottom: 6,
+                    padding: 14,
+                    marginBottom: 10,
                     background: getDecisionBg(result.decision),
-                    border: `1px solid ${getDecisionColor(result.decision)}40`,
+                    border: `1px solid ${getDecisionColor(result.decision)}`,
+                    borderLeft: `4px solid ${getDecisionColor(result.decision)}`,
                     borderRadius: 8,
-                    fontSize: 12
+                    fontSize: 13,
+                    transition: 'all 0.2s',
+                    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.2)'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'translateX(4px)'
+                    e.currentTarget.style.boxShadow = '0 4px 16px rgba(0, 0, 0, 0.3)'
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'translateX(0)'
+                    e.currentTarget.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.2)'
                   }}
                 >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
-                    <span style={{ fontWeight: 600, color: '#7a4a3a' }}>
-                      {result.userId} • {result.type} {result.amount} {result.currency}
-                    </span>
-                    <span style={{ fontSize: 10, color: '#a87a64' }}>{result.timestamp}</span>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8, alignItems: 'center' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <span style={{ fontSize: 16 }}>💳</span>
+                      <span style={{ fontWeight: 600, color: '#f1f5f9', fontFamily: 'monospace' }}>
+                        {result.userId}
+                      </span>
+                      <span style={{ color: '#64748b' }}>•</span>
+                      <span style={{ color: '#94a3b8' }}>{result.type}</span>
+                      <span style={{ fontWeight: 600, color: '#f1f5f9' }}>${result.amount} {result.currency}</span>
+                    </div>
+                    <span style={{ fontSize: 10, color: '#64748b', fontFamily: 'monospace' }}>{result.timestamp}</span>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span style={{ color: '#a87a64' }}>
-                      Score: {(result.riskScore || 0).toFixed(1)} • {result.country || 'N/A'}
-                    </span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                      <span style={{ color: '#94a3b8', fontSize: 12 }}>
+                        🎯 Risk: <span style={{ fontWeight: 700, color: '#f1f5f9' }}>{(result.riskScore || 0).toFixed(0)}</span>
+                      </span>
+                      <span style={{ color: '#64748b' }}>•</span>
+                      <span style={{ color: '#94a3b8', fontSize: 12 }}>
+                        🌍 {result.country || 'N/A'}
+                      </span>
+                    </div>
                     <span
                       style={{
-                        padding: '2px 8px',
-                        borderRadius: 4,
+                        padding: '4px 12px',
+                        borderRadius: 6,
                         background: getDecisionColor(result.decision),
                         color: 'white',
                         fontWeight: 700,
                         fontSize: 10,
-                        textTransform: 'uppercase'
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.5px',
+                        boxShadow: `0 2px 8px ${getDecisionColor(result.decision)}80`
                       }}
                     >
                       {result.decision}
@@ -231,44 +281,66 @@ export default function Home() {
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-            gap: 14,
-            marginTop: 18,
+            gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+            gap: 16,
+            marginTop: 32,
           }}
         >
           {[
             {
-              title: 'Intelligence Layer',
-              body: 'Adds AI-driven risk assessment without replacing core payment rails.',
+              icon: '🧠',
+              title: 'AI-Powered Intelligence',
+              body: 'Machine learning models analyze transaction patterns in real-time, detecting anomalies human analysts might miss.',
             },
             {
+              icon: '📊',
               title: 'Explainable Decisions',
-              body: 'Every decision is justified, traceable, and auditable.',
+              body: 'Every risk score backed by transparent reasoning. Full audit trail for compliance and regulatory requirements.',
             },
             {
-              title: 'Case Generation',
-              body: 'REVIEW/BLOCK decisions create full investigation packs automatically.',
+              icon: '⚡',
+              title: 'Instant Case Generation',
+              body: 'Automated investigation workflows. High-risk transactions trigger detailed case files with evidence and recommendations.',
             },
             {
-              title: 'Audit-Ready',
-              body: 'Append-only logging supports compliance and internal governance.',
+              icon: '🔒',
+              title: 'Enterprise Security',
+              body: 'Bank-grade encryption, append-only audit logs, and compliance with global financial security standards.',
             },
           ].map((item) => (
             <div
               key={item.title}
               style={{
-                padding: '14px 16px',
-                borderRadius: 18,
-                border: '1px solid #e2cfc4',
-                background: '#fffbf7',
-                boxShadow: '0 14px 24px rgba(160, 110, 90, 0.12)',
+                padding: '20px',
+                borderRadius: 12,
+                border: '1px solid rgba(71, 85, 105, 0.5)',
+                background: 'linear-gradient(135deg, rgba(30, 41, 59, 0.8) 0%, rgba(15, 23, 42, 0.9) 100%)',
+                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
+                transition: 'all 0.3s',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-4px)'
+                e.currentTarget.style.boxShadow = '0 12px 48px rgba(59, 130, 246, 0.3)'
+                e.currentTarget.style.borderColor = 'rgba(59, 130, 246, 0.5)'
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)'
+                e.currentTarget.style.boxShadow = '0 8px 32px rgba(0, 0, 0, 0.3)'
+                e.currentTarget.style.borderColor = 'rgba(71, 85, 105, 0.5)'
               }}
             >
-              <div style={{ fontWeight: 700, color: '#7a4a3a', marginBottom: 6 }}>{item.title}</div>
-              <div style={{ fontSize: 12, color: '#a87a64', lineHeight: 1.5 }}>{item.body}</div>
+              <div style={{ fontSize: 32, marginBottom: 12 }}>{item.icon}</div>
+              <div style={{ fontWeight: 700, color: '#f1f5f9', marginBottom: 8, fontSize: 16 }}>{item.title}</div>
+              <div style={{ fontSize: 13, color: '#94a3b8', lineHeight: 1.6 }}>{item.body}</div>
             </div>
           ))}
         </div>
+        <style>{`
+          @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+          }
+        `}</style>
       </section>
     </main>
   )

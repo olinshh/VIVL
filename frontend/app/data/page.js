@@ -35,75 +35,96 @@ export default async function DataPage({ searchParams }) {
   }
 
   return (
-    <main style={{ height: 'calc(100svh - 64px)', padding: 24, boxSizing: 'border-box' }}>
-      <section style={{ maxWidth: 980, margin: '0 auto' }}>
+    <main style={{ height: 'calc(100svh - 64px)', padding: 32, boxSizing: 'border-box', overflow: 'auto' }}>
+      <section style={{ maxWidth: 1200, margin: '0 auto' }}>
         <Link
           href="/"
+          className="back-link"
           style={{
-            display: 'inline-block',
-            marginBottom: 12,
-            padding: '6px 12px',
-            borderRadius: 999,
-            border: '1px solid #ead8d0',
-            background: '#fffbf7',
-            color: '#7a4a3a',
+            display: 'inline-flex',
+            alignItems: 'center',
+            marginBottom: 20,
+            padding: '10px 20px',
+            borderRadius: 8,
+            border: '1px solid rgba(71, 85, 105, 0.5)',
+            background: 'rgba(51, 65, 85, 0.5)',
+            color: '#94a3b8',
             textDecoration: 'none',
-            fontSize: 12,
+            fontSize: 13,
             fontWeight: 600,
+            transition: 'all 0.2s',
           }}
         >
-          Back
+          ← Back
         </Link>
-        <header style={{ marginBottom: 16 }}>
-          <h1 style={{ margin: 0, fontSize: 24, color: '#7a4a3a' }}>All Cases</h1>
-          <p style={{ margin: '6px 0 0', color: '#a1705a' }}>Open, closed, and finished</p>
+        <header style={{ marginBottom: 20 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <div style={{ fontSize: 32 }}>🗃️</div>
+            <div>
+              <h1 style={{ margin: 0, fontSize: 28, fontWeight: 700, background: 'linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>All Cases</h1>
+              <p style={{ margin: '4px 0 0', color: '#94a3b8', fontSize: 14 }}>Complete investigation history</p>
+            </div>
+          </div>
         </header>
 
-        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 12 }}>
-          <Link href="/data?sort=created_at&dir=desc" className="sort-pill">Newest</Link>
-          <Link href="/data?sort=created_at&dir=asc" className="sort-pill">Oldest</Link>
-          <Link href="/data?sort=case_id&dir=asc" className="sort-pill">Case ID</Link>
-          <Link href="/data?sort=status&dir=asc" className="sort-pill">Status</Link>
-          <Link href="/data?sort=confidence&dir=desc" className="sort-pill">Confidence</Link>
+        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 20 }}>
+          <Link href="/data?sort=created_at&dir=desc" className="sort-pill">🔽 Newest</Link>
+          <Link href="/data?sort=created_at&dir=asc" className="sort-pill">🔼 Oldest</Link>
+          <Link href="/data?sort=case_id&dir=asc" className="sort-pill">🎫 Case ID</Link>
+          <Link href="/data?sort=status&dir=asc" className="sort-pill">🟢 Status</Link>
+          <Link href="/data?sort=confidence&dir=desc" className="sort-pill">🎯 Confidence</Link>
         </div>
 
         <div
           style={{
-            maxHeight: 520,
+            maxHeight: 600,
             overflowY: 'auto',
-            borderRadius: 18,
-            border: '1px solid rgba(226, 207, 196, 0.7)',
-            background: 'rgba(255, 252, 248, 0.7)',
-            boxShadow: '0 18px 32px rgba(160, 110, 90, 0.12)',
+            borderRadius: 12,
+            border: '1px solid rgba(71, 85, 105, 0.5)',
+            background: 'rgba(15, 23, 42, 0.97)',
+            boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5)',
+            backdropFilter: 'blur(20px)',
           }}
         >
-          {error && <div style={{ padding: 14, color: '#b0412f' }}>{error}</div>}
-          {!error && cases.length === 0 && <div style={{ padding: 14, color: '#a1705a' }}>No cases available.</div>}
+          {error && <div style={{ padding: 20, color: '#ef4444', background: 'rgba(239, 68, 68, 0.1)', margin: 12, borderRadius: 8, border: '1px solid rgba(239, 68, 68, 0.3)' }}>{error}</div>}
+          {!error && cases.length === 0 && <div style={{ padding: 20, color: '#94a3b8', textAlign: 'center' }}>No cases available.</div>}
           {cases.length > 0 && (
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
               <thead>
-                <tr style={{ textAlign: 'left', color: '#7a4a3a', background: '#fff6ef' }}>
-                  <th style={{ padding: '12px 14px', borderBottom: '1px solid #e2cfc4' }}>Case ID</th>
-                  <th style={{ padding: '12px 14px', borderBottom: '1px solid #e2cfc4' }}>Status</th>
-                  <th style={{ padding: '12px 14px', borderBottom: '1px solid #e2cfc4' }}>Confidence</th>
-                  <th style={{ padding: '12px 14px', borderBottom: '1px solid #e2cfc4' }}>Primary Tx</th>
-                  <th style={{ padding: '12px 14px', borderBottom: '1px solid #e2cfc4' }}>Created</th>
+                <tr style={{ textAlign: 'left', color: '#cbd5e1', background: 'rgba(30, 41, 59, 0.8)' }}>
+                  <th style={{ padding: '16px 18px', borderBottom: '1px solid rgba(71, 85, 105, 0.5)', fontWeight: 700, fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Case ID</th>
+                  <th style={{ padding: '16px 18px', borderBottom: '1px solid rgba(71, 85, 105, 0.5)', fontWeight: 700, fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Status</th>
+                  <th style={{ padding: '16px 18px', borderBottom: '1px solid rgba(71, 85, 105, 0.5)', fontWeight: 700, fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Confidence</th>
+                  <th style={{ padding: '16px 18px', borderBottom: '1px solid rgba(71, 85, 105, 0.5)', fontWeight: 700, fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Primary Tx</th>
+                  <th style={{ padding: '16px 18px', borderBottom: '1px solid rgba(71, 85, 105, 0.5)', fontWeight: 700, fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Created</th>
                 </tr>
               </thead>
               <tbody>
                 {cases.map((item) => (
-                  <tr key={item.case_id} style={{ color: '#7a4a3a' }}>
-                    <td style={{ padding: '10px 14px', borderBottom: '1px solid #f0e3db' }}>{item.case_id}</td>
-                    <td style={{ padding: '10px 14px', borderBottom: '1px solid #f0e3db' }}>
-                      {item.status || 'open'}
+                  <tr key={item.case_id} style={{ color: '#94a3b8' }}>
+                    <td style={{ padding: '14px 18px', borderBottom: '1px solid rgba(51, 65, 85, 0.5)', fontFamily: 'monospace', color: '#f1f5f9', fontWeight: 600 }}>{item.case_id}</td>
+                    <td style={{ padding: '14px 18px', borderBottom: '1px solid rgba(51, 65, 85, 0.5)' }}>
+                      <span style={{ 
+                        padding: '4px 10px', 
+                        borderRadius: 6, 
+                        background: item.status === 'open' ? 'rgba(234, 179, 8, 0.15)' : 'rgba(34, 197, 94, 0.15)',
+                        border: `1px solid ${item.status === 'open' ? 'rgba(234, 179, 8, 0.3)' : 'rgba(34, 197, 94, 0.3)'}`,
+                        color: item.status === 'open' ? '#fde047' : '#86efac',
+                        fontSize: 11,
+                        fontWeight: 700,
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.5px'
+                      }}>
+                        {item.status || 'open'}
+                      </span>
                     </td>
-                    <td style={{ padding: '10px 14px', borderBottom: '1px solid #f0e3db' }}>
+                    <td style={{ padding: '14px 18px', borderBottom: '1px solid rgba(51, 65, 85, 0.5)', fontWeight: 600, color: '#cbd5e1' }}>
                       {item.confidence || '—'}
                     </td>
-                    <td style={{ padding: '10px 14px', borderBottom: '1px solid #f0e3db' }}>
+                    <td style={{ padding: '14px 18px', borderBottom: '1px solid rgba(51, 65, 85, 0.5)', fontFamily: 'monospace', fontSize: 12 }}>
                       {item.primary_transaction_id || '—'}
                     </td>
-                    <td style={{ padding: '10px 14px', borderBottom: '1px solid #f0e3db' }}>
+                    <td style={{ padding: '14px 18px', borderBottom: '1px solid rgba(51, 65, 85, 0.5)', color: '#64748b', fontSize: 12 }}>
                       {item.created_at || '—'}
                     </td>
                   </tr>
@@ -113,24 +134,37 @@ export default async function DataPage({ searchParams }) {
           )}
         </div>
         <style>{`
+          .back-link:hover {
+            background: rgba(59, 130, 246, 0.2) !important;
+            border-color: rgba(59, 130, 246, 0.5) !important;
+            color: #60a5fa !important;
+          }
           .sort-pill {
-            padding: 6px 12px;
-            border-radius: 999px;
-            border: 1px solid #ead8d0;
-            background: #fffbf7;
-            color: #7a4a3a;
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: 1px solid rgba(71, 85, 105, 0.5);
+            background: rgba(51, 65, 85, 0.5);
+            color: #94a3b8;
             text-decoration: none;
-            font-size: 12px;
+            font-size: 13px;
             font-weight: 600;
-            transition: transform 140ms ease, box-shadow 140ms ease, border-color 140ms ease;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
           }
           .sort-pill:hover {
             transform: translateY(-1px);
-            box-shadow: 0 8px 14px rgba(160, 110, 90, 0.18);
-            border-color: #d86b2f;
+            box-shadow: 0 4px 16px rgba(59, 130, 246, 0.3);
+            border-color: rgba(59, 130, 246, 0.5);
+            background: rgba(59, 130, 246, 0.2);
+            color: #60a5fa;
+          }
+          tbody tr {
+            transition: background 0.2s ease;
           }
           tbody tr:hover {
-            background: #fff3ea;
+            background: rgba(59, 130, 246, 0.1);
           }
         `}</style>
       </section>

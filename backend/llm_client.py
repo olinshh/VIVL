@@ -41,16 +41,12 @@ def adjudicate_decision(
 ) -> Optional[LLMDecisionOutput]:
     """
     Call LLM to produce final decision with rationale.
-    Hard policy: LLM cannot turn a hard block_candidate into approve.
+    Hard policy: LLM cannot turn a block_candidate into approve.
     Returns None if LLM unavailable or parse fails (caller should use fallback).
     """
-    # NOTE: LLM disabled to avoid API quota timeouts (free tier: 20 requests/day)
-    # System works perfectly with deterministic fallback scoring
-    # To re-enable: comment out the line below and ensure GEMINI_API_KEY is set
-    return None
-    
     model = _get_model()
     if not model:
+        print("⚠️  LLM not available (API key missing or library not installed)")
         return None
 
     # Build prompt with hard rules
@@ -88,6 +84,7 @@ Output ONLY this JSON, no markdown or extra text:
             lines = text.split("\n")
             text = "\n".join(lines[1:-1]) if lines[0].strip() == "```json" else "\n".join(lines[1:-1])
         data = json.loads(text)
+        print(f"✅ LLM adjudication successful for tx {transaction.get('transaction_id', 'unknown')}")
         return LLMDecisionOutput(
             decision=data.get("decision", "review"),
             risk_score=max(0, min(100, int(data.get("risk_score", risk_score_base)))),
@@ -96,7 +93,13 @@ Output ONLY this JSON, no markdown or extra text:
             confidence=data.get("confidence", "medium"),
         )
     except Exception as e:
-        print(f"LLM adjudication error: {e}")
+        error_msg = str(e)
+        if "429" in error_msg or "quota" in error_msg.lower():
+            print(f"⚠️  LLM quota exceeded - using deterministic fallback (tx: {transaction.get('transaction_id', 'unknown')})")
+        elif "401" in error_msg or "403" in error_msg:
+            print(f"⚠️  LLM authentication error - check API key (tx: {transaction.get('transaction_id', 'unknown')})")
+        else:
+            print(f"⚠️  LLM error: {e} - using deterministic fallback")
         return None
 
 
@@ -146,6 +149,7 @@ Output ONLY valid JSON with this exact structure (no markdown):
             lines = text.split("\n")
             text = "\n".join(lines[1:-1])
         data = json.loads(text)
+        print(f"✅ LLM case generation successful for tx {transaction.get('transaction_id', 'unknown')}")
         return LLMCaseOutput(
             confidence=data.get("confidence", "medium"),
             hypotheses=[HypothesisItem(**h) for h in data.get("hypotheses", []) if isinstance(h, dict)],
@@ -154,5 +158,10 @@ Output ONLY valid JSON with this exact structure (no markdown):
             recommendations=[RecommendationItem(**r) for r in data.get("recommendations", []) if isinstance(r, dict)],
             investigation_suggestions=data.get("investigation_suggestions", []),
         )
-    except Exception:
+    except Exception as e:
+        error_msg = str(e)
+        if "429" in error_msg or "quota" in error_msg.lower():
+            print(f"⚠️  LLM quota exceeded for case generation - using fallback")
+        else:
+            print(f"⚠️  LLM case generation error: {e}")
         return None

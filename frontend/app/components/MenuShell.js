@@ -1,10 +1,10 @@
 'use client'
 
 import Link from 'next/link'
-import { Cormorant_Garamond } from 'next/font/google'
+import { Inter } from 'next/font/google'
 import { useState } from 'react'
 
-const logoFont = Cormorant_Garamond({ subsets: ['latin'], weight: ['600', '700'] })
+const logoFont = Inter({ subsets: ['latin'], weight: ['600', '700'] })
 
 export default function MenuShell({ children }) {
   const [isOpen, setIsOpen] = useState(false)
@@ -21,10 +21,11 @@ export default function MenuShell({ children }) {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          padding: '0 20px',
-          borderBottom: '1px solid #ead8d0',
-          background: 'linear-gradient(180deg, #fdf8f5 0%, #f6ede7 100%)',
-          boxShadow: '0 10px 24px rgba(160, 110, 90, 0.14)',
+          padding: '0 24px',
+          borderBottom: '1px solid rgba(71, 85, 105, 0.5)',
+          background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.97) 0%, rgba(30, 41, 59, 0.98) 100%)',
+          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.5)',
+          backdropFilter: 'blur(20px)',
           zIndex: 30,
         }}
       >
@@ -38,30 +39,30 @@ export default function MenuShell({ children }) {
             height: 44,
             display: 'grid',
             placeItems: 'center',
-            border: '1px solid #ead8d0',
-            borderRadius: 12,
-            background: 'linear-gradient(180deg, #fffaf6 0%, #f1e6de 100%)',
-            boxShadow: '0 8px 16px rgba(160, 110, 90, 0.16)',
+            border: '1px solid rgba(71, 85, 105, 0.5)',
+            borderRadius: 8,
+            background: 'rgba(51, 65, 85, 0.5)',
+            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
             cursor: 'pointer',
-            transition: 'transform 120ms ease, box-shadow 120ms ease',
+            transition: 'all 0.2s ease',
           }}
           onMouseDown={(event) => {
-            event.currentTarget.style.transform = 'scale(0.98)'
-            event.currentTarget.style.boxShadow = '0 4px 10px rgba(160, 110, 90, 0.2)'
+            event.currentTarget.style.transform = 'scale(0.95)'
+            event.currentTarget.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.4)'
           }}
           onMouseUp={(event) => {
             event.currentTarget.style.transform = 'scale(1)'
-            event.currentTarget.style.boxShadow = '0 8px 16px rgba(160, 110, 90, 0.16)'
+            event.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.3)'
           }}
           onMouseLeave={(event) => {
             event.currentTarget.style.transform = 'scale(1)'
-            event.currentTarget.style.boxShadow = '0 8px 16px rgba(160, 110, 90, 0.16)'
+            event.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.3)'
           }}
         >
-          <span style={{ display: 'grid', gap: 5 }}>
-            <span style={{ display: 'block', width: 20, height: 2, background: '#7a4a3a', borderRadius: 999 }} />
-            <span style={{ display: 'block', width: 20, height: 2, background: '#7a4a3a', borderRadius: 999 }} />
-            <span style={{ display: 'block', width: 20, height: 2, background: '#7a4a3a', borderRadius: 999 }} />
+          <span style={{ display: 'grid', gap: 4 }}>
+            <span style={{ display: 'block', width: 18, height: 2, background: '#f1f5f9', borderRadius: 4 }} />
+            <span style={{ display: 'block', width: 18, height: 2, background: '#f1f5f9', borderRadius: 4 }} />
+            <span style={{ display: 'block', width: 18, height: 2, background: '#f1f5f9', borderRadius: 4 }} />
           </span>
         </button>
 
@@ -76,10 +77,11 @@ export default function MenuShell({ children }) {
               opacity: isOpen ? 1 : 0,
               pointerEvents: isOpen ? 'auto' : 'none',
               transition: 'transform 180ms ease, opacity 180ms ease',
-              background: '#fff6f6',
-              border: '1px solid #ead8d0',
-              borderRadius: 18,
-              boxShadow: '0 12px 22px rgba(160, 110, 90, 0.16)',
+              background: 'rgba(15, 23, 42, 0.97)',
+              border: '1px solid rgba(71, 85, 105, 0.5)',
+              borderRadius: 12,
+              boxShadow: '0 12px 32px rgba(0, 0, 0, 0.5)',
+              backdropFilter: 'blur(20px)',
               padding: '8px 10px',
               display: 'flex',
               gap: 8,
@@ -92,23 +94,27 @@ export default function MenuShell({ children }) {
                 href="/"
                 onClick={() => setIsOpen(false)}
                 style={{
-                  padding: '6px 12px',
-                  borderRadius: 999,
-                  border: '1px solid #ead8d0',
-                  background: '#fffbf7',
-                  color: '#7a4a3a',
+                  padding: '8px 16px',
+                  borderRadius: 8,
+                  border: '1px solid rgba(71, 85, 105, 0.5)',
+                  background: 'rgba(51, 65, 85, 0.5)',
+                  color: '#94a3b8',
                   textDecoration: 'none',
                   fontSize: 13,
                   fontWeight: 600,
-                  transition: 'transform 140ms ease, box-shadow 140ms ease, background 140ms ease',
+                  transition: 'all 0.2s ease',
                 }}
                 onMouseEnter={(event) => {
-                  event.currentTarget.style.background = '#f3e7de'
-                  event.currentTarget.style.boxShadow = '0 6px 12px rgba(160, 110, 90, 0.18)'
+                  event.currentTarget.style.background = 'rgba(59, 130, 246, 0.2)'
+                  event.currentTarget.style.borderColor = 'rgba(59, 130, 246, 0.5)'
+                  event.currentTarget.style.color = '#60a5fa'
+                  event.currentTarget.style.boxShadow = '0 4px 12px rgba(59, 130, 246, 0.3)'
                   event.currentTarget.style.transform = 'translateY(-1px)'
                 }}
                 onMouseLeave={(event) => {
-                  event.currentTarget.style.background = '#fffbf7'
+                  event.currentTarget.style.background = 'rgba(51, 65, 85, 0.5)'
+                  event.currentTarget.style.borderColor = 'rgba(71, 85, 105, 0.5)'
+                  event.currentTarget.style.color = '#94a3b8'
                   event.currentTarget.style.boxShadow = 'none'
                   event.currentTarget.style.transform = 'translateY(0)'
                 }}
@@ -119,23 +125,27 @@ export default function MenuShell({ children }) {
                 href="/cases"
                 onClick={() => setIsOpen(false)}
                 style={{
-                  padding: '6px 12px',
-                  borderRadius: 999,
-                  border: '1px solid #ead8d0',
-                  background: '#fffbf7',
-                  color: '#7a4a3a',
+                  padding: '8px 16px',
+                  borderRadius: 8,
+                  border: '1px solid rgba(71, 85, 105, 0.5)',
+                  background: 'rgba(51, 65, 85, 0.5)',
+                  color: '#94a3b8',
                   textDecoration: 'none',
                   fontSize: 13,
                   fontWeight: 600,
-                  transition: 'transform 140ms ease, box-shadow 140ms ease, background 140ms ease',
+                  transition: 'all 0.2s ease',
                 }}
                 onMouseEnter={(event) => {
-                  event.currentTarget.style.background = '#f3e7de'
-                  event.currentTarget.style.boxShadow = '0 6px 12px rgba(160, 110, 90, 0.18)'
+                  event.currentTarget.style.background = 'rgba(59, 130, 246, 0.2)'
+                  event.currentTarget.style.borderColor = 'rgba(59, 130, 246, 0.5)'
+                  event.currentTarget.style.color = '#60a5fa'
+                  event.currentTarget.style.boxShadow = '0 4px 12px rgba(59, 130, 246, 0.3)'
                   event.currentTarget.style.transform = 'translateY(-1px)'
                 }}
                 onMouseLeave={(event) => {
-                  event.currentTarget.style.background = '#fffbf7'
+                  event.currentTarget.style.background = 'rgba(51, 65, 85, 0.5)'
+                  event.currentTarget.style.borderColor = 'rgba(71, 85, 105, 0.5)'
+                  event.currentTarget.style.color = '#94a3b8'
                   event.currentTarget.style.boxShadow = 'none'
                   event.currentTarget.style.transform = 'translateY(0)'
                 }}
@@ -146,23 +156,27 @@ export default function MenuShell({ children }) {
                 href="/data"
                 onClick={() => setIsOpen(false)}
                 style={{
-                  padding: '6px 12px',
-                  borderRadius: 999,
-                  border: '1px solid #ead8d0',
-                  background: '#fffbf7',
-                  color: '#7a4a3a',
+                  padding: '8px 16px',
+                  borderRadius: 8,
+                  border: '1px solid rgba(71, 85, 105, 0.5)',
+                  background: 'rgba(51, 65, 85, 0.5)',
+                  color: '#94a3b8',
                   textDecoration: 'none',
                   fontSize: 13,
                   fontWeight: 600,
-                  transition: 'transform 140ms ease, box-shadow 140ms ease, background 140ms ease',
+                  transition: 'all 0.2s ease',
                 }}
                 onMouseEnter={(event) => {
-                  event.currentTarget.style.background = '#f3e7de'
-                  event.currentTarget.style.boxShadow = '0 6px 12px rgba(160, 110, 90, 0.18)'
+                  event.currentTarget.style.background = 'rgba(59, 130, 246, 0.2)'
+                  event.currentTarget.style.borderColor = 'rgba(59, 130, 246, 0.5)'
+                  event.currentTarget.style.color = '#60a5fa'
+                  event.currentTarget.style.boxShadow = '0 4px 12px rgba(59, 130, 246, 0.3)'
                   event.currentTarget.style.transform = 'translateY(-1px)'
                 }}
                 onMouseLeave={(event) => {
-                  event.currentTarget.style.background = '#fffbf7'
+                  event.currentTarget.style.background = 'rgba(51, 65, 85, 0.5)'
+                  event.currentTarget.style.borderColor = 'rgba(71, 85, 105, 0.5)'
+                  event.currentTarget.style.color = '#94a3b8'
                   event.currentTarget.style.boxShadow = 'none'
                   event.currentTarget.style.transform = 'translateY(0)'
                 }}
@@ -176,22 +190,39 @@ export default function MenuShell({ children }) {
         <Link
           href="/"
           style={{
-            fontWeight: 800,
-            fontSize: 26,
-            letterSpacing: 2.5,
-            background: 'linear-gradient(120deg, #fff2ea 0%, #f3c8a4 45%, #d86b2f 100%)',
-            color: 'transparent',
-            WebkitTextFillColor: 'transparent',
-            backgroundClip: 'text',
-            WebkitBackgroundClip: 'text',
-            textShadow: 'none',
-            WebkitTextStroke: '0.6px rgba(122, 74, 58, 0.85)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 12,
             textDecoration: 'none',
-            textTransform: 'uppercase',
           }}
-          className={logoFont.className}
         >
-          VIVL
+          <div style={{ 
+            width: 40, 
+            height: 40, 
+            borderRadius: 10, 
+            background: 'linear-gradient(135deg, #3b82f6 0%, #1e40af 100%)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: 20,
+            boxShadow: '0 6px 20px rgba(59, 130, 246, 0.4)'
+          }}>🛡️</div>
+          <span
+            style={{
+              fontWeight: 700,
+              fontSize: 24,
+              letterSpacing: '-0.5px',
+              background: 'linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%)',
+              color: 'transparent',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+              WebkitBackgroundClip: 'text',
+              textTransform: 'uppercase',
+            }}
+            className={logoFont.className}
+          >
+            VIVL
+          </span>
         </Link>
       </header>
 
@@ -199,38 +230,15 @@ export default function MenuShell({ children }) {
         style={{
           height: '100svh',
           paddingTop: 64,
-          background:
-            'radial-gradient(circle at top, #fdf8f5 0%, #f1e6de 45%, #ffffff 100%)',
+          background: 'radial-gradient(circle at 50% 50%, rgba(30, 41, 59, 0.4) 0%, rgba(15, 23, 42, 0.95) 100%)',
           overflow: 'hidden',
           boxSizing: 'border-box',
           position: 'relative',
         }}
       >
-        <div
-          style={{
-            position: 'absolute',
-            inset: 0,
-            backgroundImage:
-              'radial-gradient(40% 40% at 10% 20%, rgba(255, 233, 210, 0.95) 0%, rgba(255, 233, 210, 0) 70%),' +
-              'radial-gradient(45% 45% at 90% 80%, rgba(255, 210, 170, 0.9) 0%, rgba(255, 210, 170, 0) 75%)',
-            backgroundSize: '200% 200%',
-            backgroundPosition: '0% 0%',
-            opacity: 0.9,
-            animation: 'shine-sweep 14s linear infinite',
-            pointerEvents: 'none',
-            zIndex: 0,
-          }}
-        />
         <div style={{ position: 'relative', zIndex: 1, height: '100%' }}>
           {children}
         </div>
-        <style>{`
-          @keyframes shine-sweep {
-            0% { background-position: 0% 0%; }
-            50% { background-position: 100% 80%; }
-            100% { background-position: 0% 0%; }
-          }
-        `}</style>
       </div>
     </>
   )
